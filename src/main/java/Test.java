@@ -3,11 +3,11 @@ public class Test {
         Class<?> c = Class.forName("Test");
         System.out.println(c);
 
-        Class<?> c2 = loadClass("Test");
+        Class<?> c2 = loadClass();
         System.out.println(c2);
     }
 
-    public static Class<?> loadClass(String className) throws Exception {
-        return Class.forName(className);
+    public static Class<?> loadClass() throws Exception {
+        return Test.class;
     }
 }

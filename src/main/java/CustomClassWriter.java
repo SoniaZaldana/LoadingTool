@@ -19,7 +19,7 @@ public class CustomClassWriter {
     }
 
     public byte[] changeLoadMethod() {
-        loadMethodAdapter = new LoadMethodAdapter(writer);
+        loadMethodAdapter = new LoadMethodAdapter(writer, className);
         reader.accept(loadMethodAdapter, 0);
         return writer.toByteArray();
     }
