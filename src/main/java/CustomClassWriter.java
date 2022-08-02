@@ -5,12 +5,13 @@ import java.io.IOException;
 
 public class CustomClassWriter {
     LoadMethodAdapter loadMethodAdapter;
-    static String className = "Test";
+    String className;
     ClassReader reader;
     ClassWriter writer;
 
-    public CustomClassWriter() {
+    public CustomClassWriter(String className) {
         try {
+            this.className = className;
             reader = new ClassReader(className);
             writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS);
         } catch (IOException e) {

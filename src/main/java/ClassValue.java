@@ -15,15 +15,6 @@ public class ClassValue extends BasicValue {
         this.name = name;
     }
 
-    public ClassValue(ClassValue v) {
-        super(Type.getObjectType("java/lang/Class"));
-        this.name = new String(v.getName());
-    }
-
-    public String getName() {
-        return name;
-    }
-
     public boolean equals(Object o) {
         if (this == o) {
             return true;
