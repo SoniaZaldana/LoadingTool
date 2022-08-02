@@ -12,7 +12,7 @@ public class CustomClassWriter {
     public CustomClassWriter() {
         try {
             reader = new ClassReader(className);
-            writer = new ClassWriter(reader, 0);
+            writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -20,7 +20,7 @@ public class CustomClassWriter {
 
     public byte[] changeLoadMethod() {
         loadMethodAdapter = new LoadMethodAdapter(writer, className);
-        reader.accept(loadMethodAdapter, 0);
+        reader.accept(loadMethodAdapter, ClassReader.SKIP_FRAMES);
         return writer.toByteArray();
     }
 

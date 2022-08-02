@@ -6,7 +6,7 @@ public class LoadingTool {
         CustomClassWriter writer = new CustomClassWriter();
         byte[] bytes = writer.changeLoadMethod();
 
-        try(FileOutputStream fos = new FileOutputStream("ModifiedClass.class")) {
+        try(FileOutputStream fos = new FileOutputStream("Test.class")) {
             fos.write(bytes);
         } catch (Exception e) {
             e.printStackTrace();
