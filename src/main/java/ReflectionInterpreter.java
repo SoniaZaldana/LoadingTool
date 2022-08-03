@@ -38,24 +38,7 @@ public class ReflectionInterpreter extends BasicInterpreter {
     public BasicValue naryOperation(AbstractInsnNode insn, List<? extends BasicValue> values, final InterospectiveFrame frame) throws AnalyzerException {
         if (insn instanceof MethodInsnNode) {
             MethodInsnNode m = (MethodInsnNode) insn;
-            if (m.getOpcode() == INVOKESPECIAL) {
-                // handle string constructors
-                if (m.owner.equals("java/lang/String")
-                        && m.name.equals("<init>")) {
-                    if (m.desc.equals("()V")
-                            && values.get(0) instanceof StringValue) {
-                        ((StringValue) values.get(0)).setContents("");
-                    } else if (m.desc.equals("(Ljava/lang/String;)V")
-                            && values.get(0) instanceof StringValue
-                            && values.get(1) instanceof StringValue) {
-                        ((StringValue) values.get(0)).setContents(((StringValue) values.get(1)).getContents());
-                    }
-                }
-            }
-
-            // TODO might not need the whole piece above this
-
-            else if (m.getOpcode() == INVOKESTATIC) {
+            if (m.getOpcode() == INVOKESTATIC) {
                 if (m.owner.equals("java/lang/Class")
                         && m.name.equals("forName")
                         && m.desc.equals("(Ljava/lang/String;)Ljava/lang/Class;")
