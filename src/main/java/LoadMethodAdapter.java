@@ -5,9 +5,12 @@ import static org.objectweb.asm.Opcodes.ASM9;
 
 public class LoadMethodAdapter extends ClassVisitor {
 
-    public LoadMethodAdapter(ClassVisitor cv) {
+    private String className;
+
+    public LoadMethodAdapter(ClassVisitor cv, String className) {
         super(ASM9, cv);
         this.cv = cv;
+        this.className = className;
     }
 
     @Override
@@ -18,6 +21,6 @@ public class LoadMethodAdapter extends ClassVisitor {
             String signature,
             String[] exceptions) {
         MethodVisitor mv = cv.visitMethod(access, name, desc, signature, exceptions);
-        return new AdaptingMethodVisitor(mv);
+        return new AdaptingMethodVisitor(mv, this.className);
     }
 }

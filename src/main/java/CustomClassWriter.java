@@ -5,22 +5,23 @@ import java.io.IOException;
 
 public class CustomClassWriter {
     LoadMethodAdapter loadMethodAdapter;
-    static String className = "Test";
+    String className;
     ClassReader reader;
     ClassWriter writer;
 
-    public CustomClassWriter() {
+    public CustomClassWriter(String className) {
         try {
+            this.className = className;
             reader = new ClassReader(className);
-            writer = new ClassWriter(reader, 0);
+            writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public byte[] changeLoadMethod() {
-        loadMethodAdapter = new LoadMethodAdapter(writer);
-        reader.accept(loadMethodAdapter, 0);
+        loadMethodAdapter = new LoadMethodAdapter(writer, className);
+        reader.accept(loadMethodAdapter, ClassReader.SKIP_FRAMES);
         return writer.toByteArray();
     }
 
