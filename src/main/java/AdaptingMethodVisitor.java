@@ -90,7 +90,7 @@ public class AdaptingMethodVisitor extends MethodVisitor implements Opcodes {
         Label label0 = new Label();
         mv.visitLabel(label0);
         mv.visitLineNumber(10, label0);
-        mv.visitLdcInsn(Type.getObjectType("java/lang/Object")); // Type.getObjectType(className) TODO fix this
+        mv.visitLdcInsn(Type.getObjectType(className.replace(".", "/")));
         mv.visitMaxs(1, 0);
     }
 
