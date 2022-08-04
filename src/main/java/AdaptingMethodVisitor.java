@@ -39,7 +39,7 @@ public class AdaptingMethodVisitor extends MethodVisitor implements Opcodes {
         if (opcode == INVOKESTATIC && owner.equals(OWNER) && name.equals(NAME)
                 && descriptor.equals(DESCRIPTOR)) {
             try {
-                processMethod();
+                processMethod(opcode, owner, name, descriptor, isInterface);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -49,7 +49,8 @@ public class AdaptingMethodVisitor extends MethodVisitor implements Opcodes {
 
     }
 
-    private void processMethod() throws Exception {
+    private void processMethod(final int opcode, final String owner, final String name, final String descriptor,
+                               final boolean isInterface) throws Exception {
         ClassReader cr = new ClassReader(className);
         ClassNode cn = new ClassNode(Opcodes.ASM9);
         cr.accept(cn, 0);
@@ -77,6 +78,8 @@ public class AdaptingMethodVisitor extends MethodVisitor implements Opcodes {
                             /* Change bytecode */
                             if (knownClasses.contains(clazz)) {
                                 replaceBytecodeWithLdc(mv, clazz);
+                            } else {
+                                super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
                             }
                         }
                     }

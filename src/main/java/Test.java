@@ -1,6 +1,6 @@
 public class Test {
     public static void main(String[] args) throws Exception {
-        Class<?> c = Class.forName("java.lang.Class");
+        Class<?> c = Class.forName("java.lang.System");
         System.out.println(c);
 
         Class<?> c2 = loadClass();
