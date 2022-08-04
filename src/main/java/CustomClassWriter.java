@@ -1,7 +1,5 @@
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.tree.MethodInsnNode;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +35,10 @@ public class CustomClassWriter {
     }
 
     public List<String> getKnownClasses() throws Exception {
-        ConstantVisitor constantVisitor = new ConstantVisitor(writer, className);
-        ClassReader reader = new ClassReader(className);
-        reader.accept(constantVisitor, ClassReader.SKIP_FRAMES);
+        ClassReader cr = new ClassReader(className);
+        ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS);
+        ConstantVisitor constantVisitor = new ConstantVisitor(cw, className);
+        cr.accept(constantVisitor, ClassReader.SKIP_FRAMES);
         return constantVisitor.getClassReferences();
 
     }
