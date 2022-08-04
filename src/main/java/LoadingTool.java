@@ -1,13 +1,18 @@
+import org.objectweb.asm.tree.MethodInsnNode;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 public class LoadingTool {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         CustomClassWriter writer = new CustomClassWriter("Test");
-        byte[] bytes = writer.changeLoadMethod();
+        List<String> classReferences = writer.getKnownClasses();
+
+        byte[] bytes = writer.changeLoadMethod(classReferences);
 
         try {
             Files.deleteIfExists(Paths.get("Test.class"));
@@ -20,6 +25,8 @@ public class LoadingTool {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
 
     }
 }

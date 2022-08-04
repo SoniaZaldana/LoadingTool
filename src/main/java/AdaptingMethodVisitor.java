@@ -7,6 +7,7 @@ import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.BasicValue;
 import org.objectweb.asm.tree.analysis.Frame;
 
+import java.util.List;
 public class AdaptingMethodVisitor extends MethodVisitor implements Opcodes {
 
     private final String OWNER = "java/lang/Class";
@@ -14,9 +15,12 @@ public class AdaptingMethodVisitor extends MethodVisitor implements Opcodes {
     private final String DESCRIPTOR = "(Ljava/lang/String;)Ljava/lang/Class;";
     private String className;
 
-    public AdaptingMethodVisitor(MethodVisitor mv, String className) {
+    private List<String> knownClasses;
+
+    public AdaptingMethodVisitor(MethodVisitor mv, String className, List<String> knownClasses) {
         super(Opcodes.ASM9, mv);
         this.className = className;
+        this.knownClasses = knownClasses;
     }
 
     @Override
@@ -37,7 +41,7 @@ public class AdaptingMethodVisitor extends MethodVisitor implements Opcodes {
             try {
                 processMethod();
             } catch (Exception e) {
-                e.printStackTrace(); // TODO better exception handling
+                e.printStackTrace();
             }
         } else {
             super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
@@ -71,7 +75,9 @@ public class AdaptingMethodVisitor extends MethodVisitor implements Opcodes {
                             System.out.println("reflected class " + clazz);
 
                             /* Change bytecode */
-                            replaceBytecodeWithLdc(mv, clazz);
+                            if (knownClasses.contains(clazz)) {
+                                replaceBytecodeWithLdc(mv, clazz);
+                            }
                         }
                     }
                 }
@@ -84,7 +90,7 @@ public class AdaptingMethodVisitor extends MethodVisitor implements Opcodes {
         Label label0 = new Label();
         mv.visitLabel(label0);
         mv.visitLineNumber(10, label0);
-        mv.visitLdcInsn(Type.getObjectType(className));
+        mv.visitLdcInsn(Type.getObjectType("java/lang/Object")); // Type.getObjectType(className) TODO fix this
         mv.visitMaxs(1, 0);
     }
 
