@@ -7,6 +7,10 @@ import org.objectweb.asm.tree.analysis.Frame;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Fills out the data structure containing arguments for Class.forName
+ * that are statically known constants.
+ */
 public class ConstantVisitor extends ClassVisitor {
     private String className;
     private List<String> parameters;

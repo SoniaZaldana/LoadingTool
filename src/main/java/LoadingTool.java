@@ -7,7 +7,6 @@ public class LoadingTool {
 
     public static void main(String[] args) throws Exception {
         CustomClassWriter writer = new CustomClassWriter("Test");
-        writer.processParams();
         List<String> parameters = writer.getParameters();
 
         byte[] bytes = writer.changeLoadMethod(parameters);

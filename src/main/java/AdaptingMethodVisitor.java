@@ -1,6 +1,11 @@
 import org.objectweb.asm.*;
 
 import java.util.List;
+
+/**
+ * Method visitor which transforms bytecode for Class.forName when
+ * using statically known constants.
+ */
 public class AdaptingMethodVisitor extends MethodVisitor implements Opcodes {
 
     private final String OWNER = "java/lang/Class";
