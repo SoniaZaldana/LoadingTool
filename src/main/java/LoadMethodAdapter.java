@@ -1,5 +1,4 @@
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.*;
 
 import java.util.List;
 
@@ -7,14 +6,12 @@ import static org.objectweb.asm.Opcodes.ASM9;
 
 public class LoadMethodAdapter extends ClassVisitor {
 
-    private String className;
-    private List<String> knownClasses;
+    private List<String> parameters;
 
-    public LoadMethodAdapter(ClassVisitor cv, String className, List<String> knownClasses) {
+    public LoadMethodAdapter(ClassVisitor cv, List<String> parameters) {
         super(ASM9, cv);
         this.cv = cv;
-        this.className = className;
-        this.knownClasses = knownClasses;
+        this.parameters = parameters;
     }
 
     @Override
@@ -25,6 +22,6 @@ public class LoadMethodAdapter extends ClassVisitor {
             String signature,
             String[] exceptions) {
         MethodVisitor mv = cv.visitMethod(access, name, desc, signature, exceptions);
-        return new AdaptingMethodVisitor(mv, this.className, knownClasses);
+        return new AdaptingMethodVisitor(mv, parameters);
     }
 }

@@ -22,11 +22,6 @@ public class ReflectionInterpreter extends BasicInterpreter {
             } else if (cst instanceof Type) {
                 return new ClassValue(((Type)cst).getInternalName());
             }
-        } else if (insn instanceof TypeInsnNode && insn.getOpcode() == NEW) {
-            TypeInsnNode n = (TypeInsnNode)insn;
-            if (n.desc.equals("java/lang/String")) {
-                return new StringValue(); // contents will be set later (potentially)
-            }
         }
         return super.newOperation(insn);
     }
