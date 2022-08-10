@@ -1,17 +1,14 @@
 import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 
 public class LoadingTool {
 
     public static void main(String[] args) throws Exception {
         CustomClassWriter writer = new CustomClassWriter("Test");
-        writer.doAnalysis();
-        List<String> parameters = writer.getParameters();
-        List<LdcTracker> ldcTrackers = writer.getLdcInstructions();
+        LdcTracker tracker = writer.getTracker();
 
-        byte[] bytes = writer.changeLoadMethod(parameters, ldcTrackers);
+        byte[] bytes = writer.changeLoadMethod(tracker);
         Files.deleteIfExists(Paths.get("Test.class"));
 
         try (FileOutputStream fos = new FileOutputStream("Test.class")) {

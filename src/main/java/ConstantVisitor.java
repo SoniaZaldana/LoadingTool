@@ -4,8 +4,6 @@ import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.BasicValue;
 import org.objectweb.asm.tree.analysis.Frame;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Fills out the data structure containing arguments for Class.forName
@@ -13,8 +11,7 @@ import java.util.List;
  */
 public class ConstantVisitor extends ClassVisitor {
     private String className;
-    private List<String> parameters;
-    private List<LdcTracker> ldcInstructions;
+    private LdcTracker tracker;
     private final String OWNER = "java/lang/Class";
     private final String NAME = "forName";
     private final String DESCRIPTOR = "(Ljava/lang/String;)Ljava/lang/Class;";
@@ -22,8 +19,7 @@ public class ConstantVisitor extends ClassVisitor {
     public ConstantVisitor(ClassVisitor cv, String className) {
         super(Opcodes.ASM9, cv);
         this.className = className;
-        this.parameters = new ArrayList<>();
-        this.ldcInstructions = new ArrayList<>();
+        this.tracker = new LdcTracker();
     }
 
 
@@ -38,9 +34,9 @@ public class ConstantVisitor extends ClassVisitor {
 
     }
 
-    public List<String> getParameters() { return this.parameters; }
-
-    public List<LdcTracker> getLdcInstructions() { return this.ldcInstructions; }
+    public LdcTracker getTracker() {
+        return this.tracker;
+    }
 
     private BasicValue getStackValue(int instructionIndex, int frameIndex, Frame<BasicValue>[] frames) throws AnalyzerException {
         Frame<BasicValue> f = frames[instructionIndex];
@@ -75,7 +71,7 @@ public class ConstantVisitor extends ClassVisitor {
                         if (arg != null && arg instanceof StringValue && ((StringValue) arg).getContents() != null) {
                             String clazz = ((StringValue) arg).getContents();
                             System.out.println("reflected class parameter fetched from stack: " + clazz);
-                            parameters.add(clazz);
+                            tracker.addParameter(clazz);
                         }
                     }
                 } else if (n instanceof LdcInsnNode) {
@@ -90,12 +86,12 @@ public class ConstantVisitor extends ClassVisitor {
                             BasicValue arg = getStackValue(i+1, 0, analyzer.getFrames());
                             if (arg != null && arg instanceof StringValue
                                     && ((StringValue) arg).getContents() != null) {
-                                ldcInstructions.add(new LdcTracker(true));
+                                tracker.addInstructionTracker(new InstructionTracker(true));
                                 continue;
                             }
                         }
                     }
-                    ldcInstructions.add(new LdcTracker(false));
+                    tracker.addInstructionTracker(new InstructionTracker(false));
                 }
             }
         }
