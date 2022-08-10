@@ -7,9 +7,11 @@ public class LoadingTool {
 
     public static void main(String[] args) throws Exception {
         CustomClassWriter writer = new CustomClassWriter("Test");
+        writer.doAnalysis();
         List<String> parameters = writer.getParameters();
+        List<LdcTracker> ldcTrackers = writer.getLdcInstructions();
 
-        byte[] bytes = writer.changeLoadMethod(parameters);
+        byte[] bytes = writer.changeLoadMethod(parameters, ldcTrackers);
         Files.deleteIfExists(Paths.get("Test.class"));
 
         try (FileOutputStream fos = new FileOutputStream("Test.class")) {

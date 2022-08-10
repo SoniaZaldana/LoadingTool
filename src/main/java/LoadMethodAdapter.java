@@ -7,11 +7,13 @@ import static org.objectweb.asm.Opcodes.ASM9;
 public class LoadMethodAdapter extends ClassVisitor {
 
     private List<String> parameters;
+    private List<LdcTracker> ldcTrackers;
 
-    public LoadMethodAdapter(ClassVisitor cv, List<String> parameters) {
+    public LoadMethodAdapter(ClassVisitor cv, List<String> parameters, List<LdcTracker> ldcTrackers) {
         super(ASM9, cv);
         this.cv = cv;
         this.parameters = parameters;
+        this.ldcTrackers = ldcTrackers;
     }
 
     @Override
@@ -22,6 +24,6 @@ public class LoadMethodAdapter extends ClassVisitor {
             String signature,
             String[] exceptions) {
         MethodVisitor mv = cv.visitMethod(access, name, desc, signature, exceptions);
-        return new AdaptingMethodVisitor(mv, parameters);
+        return new AdaptingMethodVisitor(mv, parameters, ldcTrackers);
     }
 }

@@ -8,7 +8,10 @@ public class CustomClassWriter {
     String className;
     ClassReader reader;
     ClassWriter writer;
-    List<String> knownParams;
+
+    List<LdcTracker> ldcInstructions;
+
+    List<String> parameters;
 
     public CustomClassWriter(String className) {
         try {
@@ -20,18 +23,27 @@ public class CustomClassWriter {
         }
     }
 
-    public byte[] changeLoadMethod(List<String> parameters) {
-        loadMethodAdapter = new LoadMethodAdapter(writer, parameters);
+    public byte[] changeLoadMethod(List<String> parameters, List<LdcTracker> ldcTrackers) {
+        loadMethodAdapter = new LoadMethodAdapter(writer, parameters, ldcTrackers);
         reader.accept(loadMethodAdapter, ClassReader.SKIP_FRAMES);
         return writer.toByteArray();
     }
 
-    public List<String> getParameters() throws Exception{
+    public void doAnalysis() throws Exception {
         ClassReader cr = new ClassReader(className);
         ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS);
         ConstantVisitor constantVisitor = new ConstantVisitor(cw, className);
         cr.accept(constantVisitor, ClassReader.SKIP_FRAMES);
-        return constantVisitor.getParameters();
+        this.parameters = constantVisitor.getParameters();
+        this.ldcInstructions = constantVisitor.getLdcInstructions();
+    }
+
+    public List<LdcTracker> getLdcInstructions() {
+        return this.ldcInstructions;
+    }
+
+    public List<String> getParameters() throws Exception{
+        return this.parameters;
     }
 
 }

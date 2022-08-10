@@ -14,6 +14,7 @@ import java.util.List;
 public class ConstantVisitor extends ClassVisitor {
     private String className;
     private List<String> parameters;
+    private List<LdcTracker> ldcInstructions;
     private final String OWNER = "java/lang/Class";
     private final String NAME = "forName";
     private final String DESCRIPTOR = "(Ljava/lang/String;)Ljava/lang/Class;";
@@ -22,6 +23,7 @@ public class ConstantVisitor extends ClassVisitor {
         super(Opcodes.ASM9, cv);
         this.className = className;
         this.parameters = new ArrayList<>();
+        this.ldcInstructions = new ArrayList<>();
     }
 
 
@@ -37,6 +39,8 @@ public class ConstantVisitor extends ClassVisitor {
     }
 
     public List<String> getParameters() { return this.parameters; }
+
+    public List<LdcTracker> getLdcInstructions() { return this.ldcInstructions; }
 
     private BasicValue getStackValue(int instructionIndex, int frameIndex, Frame<BasicValue>[] frames) throws AnalyzerException {
         Frame<BasicValue> f = frames[instructionIndex];
@@ -74,6 +78,24 @@ public class ConstantVisitor extends ClassVisitor {
                             parameters.add(clazz);
                         }
                     }
+                } else if (n instanceof LdcInsnNode) {
+
+                    /* Keep track of LDC instructions and whether they should be removed */
+                    LdcInsnNode l = (LdcInsnNode) n;
+                    AbstractInsnNode next = l.getNext();
+                    if (next instanceof MethodInsnNode) {
+                        MethodInsnNode nextInsn = (MethodInsnNode) next;
+                        if (nextInsn.owner.equals(OWNER) && nextInsn.desc.equals(DESCRIPTOR)
+                                && nextInsn.name.equals(NAME)) {
+                            BasicValue arg = getStackValue(i+1, 0, analyzer.getFrames());
+                            if (arg != null && arg instanceof StringValue
+                                    && ((StringValue) arg).getContents() != null) {
+                                ldcInstructions.add(new LdcTracker(true));
+                                continue;
+                            }
+                        }
+                    }
+                    ldcInstructions.add(new LdcTracker(false));
                 }
             }
         }

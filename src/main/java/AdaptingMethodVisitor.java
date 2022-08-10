@@ -12,11 +12,25 @@ public class AdaptingMethodVisitor extends MethodVisitor implements Opcodes {
     private final String NAME = "forName";
     private final String DESCRIPTOR = "(Ljava/lang/String;)Ljava/lang/Class;";
     private List<String> parameters;
+    private List<LdcTracker> ldcTrackers;
 
 
-    public AdaptingMethodVisitor(MethodVisitor mv, List<String> parameters) {
+    public AdaptingMethodVisitor(MethodVisitor mv, List<String> parameters, List<LdcTracker> ldcTrackers) {
         super(Opcodes.ASM9, mv);
         this.parameters = parameters;
+        this.ldcTrackers = ldcTrackers;
+    }
+
+    @Override
+    public void visitLdcInsn(final Object value) {
+        if (ldcTrackers.size() != 0) {
+            LdcTracker tracker = ldcTrackers.remove(0);
+            if (tracker.isNextInstructionForName()) {
+                System.out.println("Ldc instruction called with param " + value + " removed");
+                return;
+            }
+        }
+        super.visitLdcInsn(value);
     }
 
     @Override
