@@ -11,7 +11,6 @@ public class LoadMethodAdapter extends ClassVisitor {
         super(ASM9, cv);
         this.cv = cv;
         this.tracker = tracker;
-
     }
 
     @Override

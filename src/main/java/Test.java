@@ -20,8 +20,6 @@ public class Test {
 
         Class<?> c6 = Test.class;
         System.out.println(c6);
-
-
     }
 
     public static Class<?> loadClassKnown() throws Exception {

@@ -41,6 +41,7 @@ public class AdaptingMethodVisitor extends MethodVisitor implements Opcodes {
 
         if (opcode == INVOKESTATIC && owner.equals(OWNER) && name.equals(NAME)
                 && descriptor.equals(DESCRIPTOR)) {
+
             List<String> parameters = tracker.getParameterTracker();
             if (parameters.size() != 0) {
                 String param = parameters.remove(0);

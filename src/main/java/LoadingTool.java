@@ -7,7 +7,6 @@ public class LoadingTool {
     public static void main(String[] args) throws Exception {
         CustomClassWriter writer = new CustomClassWriter("Test");
         LdcTracker tracker = writer.getTracker();
-
         byte[] bytes = writer.changeLoadMethod(tracker);
         Files.deleteIfExists(Paths.get("Test.class"));
 

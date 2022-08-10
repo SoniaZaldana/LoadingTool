@@ -7,6 +7,7 @@ public class CustomClassWriter {
     String className;
     ClassReader reader;
     ClassWriter writer;
+    List<String> knownParams;
 
     public CustomClassWriter(String className) {
         try {
@@ -23,7 +24,6 @@ public class CustomClassWriter {
         reader.accept(loadMethodAdapter, ClassReader.SKIP_FRAMES);
         return writer.toByteArray();
     }
-
 
     public LdcTracker getTracker() throws Exception {
         ClassReader cr = new ClassReader(className);
