@@ -1,14 +1,12 @@
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import java.io.IOException;
-import java.util.List;
 
 public class CustomClassWriter {
     LoadMethodAdapter loadMethodAdapter;
     String className;
     ClassReader reader;
     ClassWriter writer;
-    List<String> knownParams;
 
     public CustomClassWriter(String className) {
         try {
@@ -20,18 +18,19 @@ public class CustomClassWriter {
         }
     }
 
-    public byte[] changeLoadMethod(List<String> parameters) {
-        loadMethodAdapter = new LoadMethodAdapter(writer, parameters);
+    public byte[] changeLoadMethod(LdcTracker tracker) {
+        loadMethodAdapter = new LoadMethodAdapter(writer, tracker);
         reader.accept(loadMethodAdapter, ClassReader.SKIP_FRAMES);
         return writer.toByteArray();
     }
 
-    public List<String> getParameters() throws Exception{
+    public LdcTracker getTracker() throws Exception {
         ClassReader cr = new ClassReader(className);
         ClassWriter cw = new ClassWriter(cr, ClassWriter.COMPUTE_MAXS);
         ConstantVisitor constantVisitor = new ConstantVisitor(cw, className);
         cr.accept(constantVisitor, ClassReader.SKIP_FRAMES);
-        return constantVisitor.getParameters();
+        return constantVisitor.getTracker();
     }
+
 
 }

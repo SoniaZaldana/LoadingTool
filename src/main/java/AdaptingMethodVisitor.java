@@ -11,12 +11,24 @@ public class AdaptingMethodVisitor extends MethodVisitor implements Opcodes {
     private final String OWNER = "java/lang/Class";
     private final String NAME = "forName";
     private final String DESCRIPTOR = "(Ljava/lang/String;)Ljava/lang/Class;";
-    private List<String> parameters;
+    private LdcTracker tracker;
 
-
-    public AdaptingMethodVisitor(MethodVisitor mv, List<String> parameters) {
+    public AdaptingMethodVisitor(MethodVisitor mv, LdcTracker tracker) {
         super(Opcodes.ASM9, mv);
-        this.parameters = parameters;
+        this.tracker = tracker;
+    }
+
+    @Override
+    public void visitLdcInsn(final Object value) {
+        List<InstructionTracker> instructionTrackerList = tracker.getInstructionTrackers();
+        if (instructionTrackerList.size() != 0) {
+            InstructionTracker tracker = instructionTrackerList.remove(0);
+            if (tracker.isNextInstructionForName()) {
+                System.out.println("Ldc instruction called with param " + value + " removed");
+                return;
+            }
+        }
+        super.visitLdcInsn(value);
     }
 
     @Override
@@ -29,6 +41,8 @@ public class AdaptingMethodVisitor extends MethodVisitor implements Opcodes {
 
         if (opcode == INVOKESTATIC && owner.equals(OWNER) && name.equals(NAME)
                 && descriptor.equals(DESCRIPTOR)) {
+
+            List<String> parameters = tracker.getParameterTracker();
             if (parameters.size() != 0) {
                 String param = parameters.remove(0);
                 System.out.println("replaced bytecode for Class.forName with param: " + param);

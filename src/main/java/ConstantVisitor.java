@@ -4,8 +4,6 @@ import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.BasicValue;
 import org.objectweb.asm.tree.analysis.Frame;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Fills out the data structure containing arguments for Class.forName
@@ -13,7 +11,7 @@ import java.util.List;
  */
 public class ConstantVisitor extends ClassVisitor {
     private String className;
-    private List<String> parameters;
+    private LdcTracker tracker;
     private final String OWNER = "java/lang/Class";
     private final String NAME = "forName";
     private final String DESCRIPTOR = "(Ljava/lang/String;)Ljava/lang/Class;";
@@ -21,7 +19,7 @@ public class ConstantVisitor extends ClassVisitor {
     public ConstantVisitor(ClassVisitor cv, String className) {
         super(Opcodes.ASM9, cv);
         this.className = className;
-        this.parameters = new ArrayList<>();
+        this.tracker = new LdcTracker();
     }
 
 
@@ -36,7 +34,9 @@ public class ConstantVisitor extends ClassVisitor {
 
     }
 
-    public List<String> getParameters() { return this.parameters; }
+    public LdcTracker getTracker() {
+        return this.tracker;
+    }
 
     private BasicValue getStackValue(int instructionIndex, int frameIndex, Frame<BasicValue>[] frames) throws AnalyzerException {
         Frame<BasicValue> f = frames[instructionIndex];
@@ -71,9 +71,27 @@ public class ConstantVisitor extends ClassVisitor {
                         if (arg != null && arg instanceof StringValue && ((StringValue) arg).getContents() != null) {
                             String clazz = ((StringValue) arg).getContents();
                             System.out.println("reflected class parameter fetched from stack: " + clazz);
-                            parameters.add(clazz);
+                            tracker.addParameter(clazz);
                         }
                     }
+                } else if (n instanceof LdcInsnNode) {
+
+                    /* Keep track of LDC instructions and whether they should be removed */
+                    LdcInsnNode l = (LdcInsnNode) n;
+                    AbstractInsnNode next = l.getNext();
+                    if (next instanceof MethodInsnNode) {
+                        MethodInsnNode nextInsn = (MethodInsnNode) next;
+                        if (nextInsn.owner.equals(OWNER) && nextInsn.desc.equals(DESCRIPTOR)
+                                && nextInsn.name.equals(NAME)) {
+                            BasicValue arg = getStackValue(i+1, 0, analyzer.getFrames());
+                            if (arg != null && arg instanceof StringValue
+                                    && ((StringValue) arg).getContents() != null) {
+                                tracker.addInstructionTracker(new InstructionTracker(true));
+                                continue;
+                            }
+                        }
+                    }
+                    tracker.addInstructionTracker(new InstructionTracker(false));
                 }
             }
         }
