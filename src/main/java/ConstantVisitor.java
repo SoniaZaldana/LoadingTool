@@ -86,12 +86,28 @@ public class ConstantVisitor extends ClassVisitor {
                             BasicValue arg = getStackValue(i+1, 0, analyzer.getFrames());
                             if (arg != null && arg instanceof StringValue
                                     && ((StringValue) arg).getContents() != null) {
-                                tracker.addInstructionTracker(new InstructionTracker(true));
+                                tracker.addLdcInstruction(new InstructionTracker(true));
                                 continue;
                             }
                         }
                     }
-                    tracker.addInstructionTracker(new InstructionTracker(false));
+                    tracker.addLdcInstruction(new InstructionTracker(false));
+                } else if (n instanceof VarInsnNode) {
+                    AbstractInsnNode prev = n.getPrevious();
+                    if (prev instanceof MethodInsnNode) {
+                        MethodInsnNode prevInsn = (MethodInsnNode) prev;
+                        if (prevInsn.owner.equals(OWNER) && prevInsn.desc.equals(DESCRIPTOR)
+                                && prevInsn.name.equals(NAME)) {
+                            BasicValue arg = getStackValue(i-1, 0, analyzer.getFrames());
+                            if (arg != null && arg instanceof StringValue
+                                    && ((StringValue) arg).getContents() != null) {
+
+                                tracker.addLoadInstructionTracker(new InstructionTracker(true));
+                                continue;
+                            }
+                        }
+                    }
+                    tracker.addLoadInstructionTracker(new InstructionTracker(false));
                 }
             }
         }

@@ -1,5 +1,5 @@
 /**
- * Represents whether an LDC instruction should be removed on account of being followed by a Class.forName call
+ * Represents whether an instruction should be removed on account of being followed by a Class.forName call
  * that got transformed.
  */
 public class InstructionTracker {
