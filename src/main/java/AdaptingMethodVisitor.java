@@ -67,29 +67,39 @@ public class AdaptingMethodVisitor extends MethodVisitor implements Opcodes {
     }
 
     private void replaceBytecode(MethodVisitor mv, String className) {
+
         mv.visitCode();
+
+        /* Create lookup object */
         Label label0 = new Label();
         mv.visitLabel(label0);
         mv.visitLineNumber(8, label0);
-        mv.visitLdcInsn(Type.getObjectType(className.replace(".", "/")));
-
+        mv.visitMethodInsn(INVOKESTATIC, "java/lang/invoke/MethodHandles", "lookup", "()Ljava/lang/invoke/MethodHandles$Lookup;", false);
         mv.visitVarInsn(ASTORE, 1);
 
+        /* Ldc instruction and storing class object */
         Label label1 = new Label();
         mv.visitLabel(label1);
         mv.visitLineNumber(9, label1);
-        mv.visitMethodInsn(INVOKESTATIC, "java/lang/invoke/MethodHandles", "lookup", "()Ljava/lang/invoke/MethodHandles$Lookup;", false);
+        mv.visitLdcInsn(Type.getObjectType(className.replace(".", "/")));
         mv.visitVarInsn(ASTORE, 2);
+
+        /* Forcing clinit with ensureInitialized */
         Label label2 = new Label();
         mv.visitLabel(label2);
         mv.visitLineNumber(10, label2);
-        mv.visitVarInsn(ALOAD, 2);
         mv.visitVarInsn(ALOAD, 1);
+        mv.visitVarInsn(ALOAD, 2);
         mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/invoke/MethodHandles$Lookup", "ensureInitialized", "(Ljava/lang/Class;)Ljava/lang/Class;", false);
+        mv.visitInsn(POP);
+
+        /* Ldc instruction */
         Label label3 = new Label();
         mv.visitLabel(label3);
-        mv.visitLineNumber(12, label3);
+        mv.visitLineNumber(22, label3);
+        mv.visitLdcInsn(Type.getObjectType(className.replace(".", "/")));
         mv.visitMaxs(2, 3);
         mv.visitEnd();
     }
+
 }
