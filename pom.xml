@@ -30,6 +30,8 @@
                 <configuration>
                     <fork>true</fork>
                     <compilerArgument>-XDignore.symbol.file</compilerArgument>
+                    <source>15</source>
+                    <target>15</target>
                 </configuration>
             </plugin>
         </plugins>

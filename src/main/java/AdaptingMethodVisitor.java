@@ -20,9 +20,9 @@ public class AdaptingMethodVisitor extends MethodVisitor implements Opcodes {
 
     @Override
     public void visitLdcInsn(final Object value) {
-        List<InstructionTracker> instructionTrackerList = tracker.getInstructionTrackers();
-        if (instructionTrackerList.size() != 0) {
-            InstructionTracker tracker = instructionTrackerList.remove(0);
+        List<InstructionTracker> ldcTrackerList = tracker.getLdcInstructionTracker();
+        if (ldcTrackerList.size() != 0) {
+            InstructionTracker tracker = ldcTrackerList.remove(0);
             if (tracker.isNextInstructionForName()) {
                 System.out.println("Ldc instruction called with param " + value + " removed");
                 return;
@@ -42,23 +42,24 @@ public class AdaptingMethodVisitor extends MethodVisitor implements Opcodes {
         if (opcode == INVOKESTATIC && owner.equals(OWNER) && name.equals(NAME)
                 && descriptor.equals(DESCRIPTOR)) {
 
-            List<String> parameters = tracker.getParameterTracker();
+            List<String> parameters = tracker.getParamsTracker();
             if (parameters.size() != 0) {
                 String param = parameters.remove(0);
                 System.out.println("replaced bytecode for Class.forName with param: " + param);
-                replaceBytecodeWithLdc(mv, param);
+                replaceBytecode(mv, param);
                 return;
             }
         }
         super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
     }
 
-    private void replaceBytecodeWithLdc(MethodVisitor mv, String className) {
+    private void replaceBytecode(MethodVisitor mv, String className) {
         mv.visitCode();
-        Label label0 = new Label();
-        mv.visitLabel(label0);
-        mv.visitLineNumber(10, label0);
+        mv.visitMethodInsn(INVOKESTATIC, "java/lang/invoke/MethodHandles", "lookup", "()Ljava/lang/invoke/MethodHandles$Lookup;", false);
         mv.visitLdcInsn(Type.getObjectType(className.replace(".", "/")));
-        mv.visitMaxs(1, 0);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/invoke/MethodHandles$Lookup", "ensureInitialized", "(Ljava/lang/Class;)Ljava/lang/Class;", false);
+        mv.visitMaxs(0, 1);
+        mv.visitEnd();
+
     }
 }

@@ -86,12 +86,12 @@ public class ConstantVisitor extends ClassVisitor {
                             BasicValue arg = getStackValue(i+1, 0, analyzer.getFrames());
                             if (arg != null && arg instanceof StringValue
                                     && ((StringValue) arg).getContents() != null) {
-                                tracker.addInstructionTracker(new InstructionTracker(true));
+                                tracker.addLdcInstruction(new InstructionTracker(true));
                                 continue;
                             }
                         }
                     }
-                    tracker.addInstructionTracker(new InstructionTracker(false));
+                    tracker.addLdcInstruction(new InstructionTracker(false));
                 }
             }
         }
