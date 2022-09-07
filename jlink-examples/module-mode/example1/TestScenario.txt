@@ -1,0 +1,3 @@
+In this example, the relationship looks like this: main.app -> jlink.module i.e. main.app exports the package main and jlink.module requires main.app. 
+
+Note, the transformation only happens for classes in modules that are accessible.

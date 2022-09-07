@@ -1,0 +1,13 @@
+In this example, the module graph looks like this:
+
+1. hello.module module-info.java file:
+module hello.module {
+    exports com.sonia.hello to main.app;
+}
+
+2. jlink.module module-info.java file: 
+module jlink.module {
+    requires hello.module;
+}
+
+Note that hello.module does not export to jlink.module, so the transformation to ldc does not happen. 

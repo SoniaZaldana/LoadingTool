@@ -1,0 +1,5 @@
+In this scenario, the relationship looks like this: main.app -> hello.module -> jlink.module i.e. main.app exports the package main, hello.module requires main.app and exports the package com.sonia.hello, and jlink.module requires hello.module. 
+
+
+Note the transformation only happens for classes in modules that are directly accessible to jlink.module i.e. will transform calls to classes in hello.module but not in main.app.
+
